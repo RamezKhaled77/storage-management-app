@@ -127,13 +127,13 @@
     @apply max-w-[95%] space-y-4 rounded-xl bg-white px-4 py-10 outline-none sm:w-fit md:rounded-[30px] md:px-8 !important;
   }
   .shad-submit-btn {
-    @apply button rounded-full bg-brand transition-all hover:bg-brand-100 !important;
+    @apply button rounded-full bg-brand text-white transition-all hover:bg-brand-100 !important;
   }
   .shad-otp {
-    @apply flex w-full justify-between gap-1 sm:gap-2 !important;
+    @apply flex w-full justify-between gap-0.5 sm:gap-2 !important;
   }
   .shad-otp-slot {
-    @apply flex size-12 justify-center gap-5 rounded-xl border-2 border-light-300 text-[40px] font-medium text-brand-100 shadow-drop-1 ring-brand md:size-16 !important;
+    @apply flex size-16 justify-center gap-5 rounded-xl border-2 border-light-300 text-[36px] font-medium text-brand-100 shadow-drop-1 ring-brand md:size-16 !important;
   }
 
   .shad-sheet {
