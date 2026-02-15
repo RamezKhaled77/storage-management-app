@@ -17,17 +17,17 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { createAccount } from "@/lib/actions/user.actions";
+import { createAccount, signInUser } from "@/lib/actions/user.actions";
 import OTPModel from "./OTPModel";
 
 type FormType = "sign-in" | "sign-up";
 
 const authFormSchema = (formType: FormType) => {
   return z.object({
-    email: z.string().email(),
+    email: z.string().trim().email(),
     fullName:
       formType === "sign-up"
-        ? z.string().min(2).max(50)
+        ? z.string().trim().min(2).max(50)
         : z.string().optional(),
   });
 };
@@ -51,11 +51,19 @@ const AuthForm = ({ type }: { type: FormType }) => {
     setIsLoading(true);
     setErrorMessage("");
 
+    const cleanEmail = data.email.trim();
+    const cleanFullName = data.fullName?.trim() || "";
+
+    console.log(cleanEmail);
+
     try {
-      const user = await createAccount({
-        email: data.email,
-        fullName: data.fullName || "",
-      });
+      const user =
+        type === "sign-up"
+          ? await createAccount({
+              email: cleanEmail,
+              fullName: cleanFullName,
+            })
+          : await signInUser({ email: cleanEmail });
 
       setAccountId(user.accountId);
     } catch {
