@@ -1,6 +1,12 @@
 "use client";
 
-import { Dialog } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import {
   DropdownMenu,
@@ -22,6 +28,20 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [action, setAction] = useState<ActionType | null>(null);
+
+  const renderDiaLogContent = () => {
+    return (
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    );
+  };
 
   return (
     <Dialog open={isModelOpen} onOpenChange={setIsModelOpen}>
@@ -86,6 +106,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+      {renderDiaLogContent()}
     </Dialog>
   );
 };
