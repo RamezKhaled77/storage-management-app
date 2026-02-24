@@ -417,3 +417,7 @@
     @apply size-full object-cover object-center !important;
   }
 }
+
+body[style*="pointer-events: none"] {
+  pointer-events: auto !important;
+}

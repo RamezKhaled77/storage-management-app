@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Models } from "node-appwrite";
 import { actionsDropdownItems } from "@/constants";
@@ -26,6 +26,8 @@ import Link from "next/link";
 import { constructDownloadUrl } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { renameFile } from "@/lib/actions/file.actions";
+import { usePathname } from "next/navigation";
 
 const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [isModelOpen, setIsModelOpen] = useState(false);
@@ -33,16 +35,37 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [action, setAction] = useState<ActionType | null>(null);
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
+  const path = usePathname();
 
-  const closeallModles = () => {
+  const closeAllModles = () => {
     setIsModelOpen(false);
     setIsDropdownOpen(false);
     setAction(null);
     setName(file.name);
     // setEmail([]);
+
+    setTimeout(() => {
+      document.body.style.pointerEvents = "auto";
+    }, 100);
   };
 
-  const handleAction = async () => {};
+  const handleAction = async () => {
+    if (!action) return;
+    setIsLoading(true);
+    let success = false;
+
+    const actions = {
+      rename: () =>
+        renameFile({ fileId: file.$id, name, extension: file.extension, path }),
+      share: () => console.log("share"),
+      delete: () => console.log("delete"),
+    };
+
+    success = await actions[action.value as keyof typeof actions]();
+
+    if (success) closeAllModles();
+    setIsLoading(false);
+  };
 
   const renderDiaLogContent = () => {
     if (!action) return null;
@@ -65,7 +88,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
         </DialogHeader>
         {["rename", "delete", "share"].includes(value) && (
           <DialogFooter className="flex flex-col gap-3 md:flex-row">
-            <Button onClick={closeallModles} className="modal-cancel-button">
+            <Button onClick={closeAllModles} className="modal-cancel-button">
               Cancel
             </Button>
             <Button
@@ -90,7 +113,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
   };
 
   return (
-    <Dialog open={isModelOpen} onOpenChange={setIsModelOpen}>
+    <>
       <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild className="shad-no-focus">
           <Image
@@ -152,8 +175,10 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-      {renderDiaLogContent()}
-    </Dialog>
+      <Dialog open={isModelOpen} onOpenChange={setIsModelOpen}>
+        {renderDiaLogContent()}
+      </Dialog>
+    </>
   );
 };
 

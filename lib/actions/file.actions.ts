@@ -3,7 +3,7 @@
 import { createAdminClient } from "../appwrite";
 import { InputFile } from "node-appwrite/file";
 import { appwriteConfig } from "../appwrite/config";
-import { ID, Models, Query } from "node-appwrite";
+import { ID, Models, Name, Query } from "node-appwrite";
 import { constructFileUrl, getFileType, parseStringify } from "../utils";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./user.actions";
@@ -60,42 +60,61 @@ export const uploadFile = async ({
   }
 };
 
-
 const createQueries = (currentUser: Models.Document) => {
   const queries = [
     Query.or([
       Query.equal("owner", [currentUser.$id]),
-      Query.contains("users",[currentUser.email])
-    ])
-  ]
+      Query.contains("users", [currentUser.email]),
+    ]),
+  ];
 
   // TODO: Search, Sort, Limits, ...
 
-  return queries
-}
-
+  return queries;
+};
 
 export const getFiles = async () => {
-  const {databases} = await createAdminClient();
+  const { databases } = await createAdminClient();
 
   try {
     const currentUser = await getCurrentUser();
 
-    if(!currentUser) throw new Error("User not found");
+    if (!currentUser) throw new Error("User not found");
 
     const queries = createQueries(currentUser);
-
 
     const files = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.filesTableId,
       queries,
-    )
+    );
 
     return parseStringify(files);
-
   } catch (error) {
     handleError(error, "Faild ro get files");
   }
-  
-}
+};
+
+export const renameFile = async ({
+  fileId,
+  name,
+  extension,
+  path,
+}: RenameFileProps) => {
+  const { databases } = await createAdminClient();
+
+  try {
+    const newName = `${name}.${extension}`;
+    const updatedFile = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesTableId,
+      fileId,
+      { name: newName },
+    );
+
+    revalidatePath(path);
+    return parseStringify(updatedFile);
+  } catch (error) {
+    handleError(error, "Faild to rename file");
+  }
+};
