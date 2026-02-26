@@ -10,7 +10,7 @@ interface Props {
   imageclassName?: string;
 }
 
-const Thumbnail = ({
+export const Thumbnail = ({
   type,
   extension,
   url = "",
